@@ -13,7 +13,6 @@ use Time::HiRes 'usleep';
 =head1 Iron::TCP
 
 a class wrapper around IO::Socket::INET to simplify non-blocking use.
-allows easy usage of timeouts
 
 =cut
 
@@ -36,6 +35,8 @@ sub wait_timeout (&$;$) {
 =head2 Iron::TCP->new(%args)
 
 if no 'sock' argument is specifed, creates a new IO::Socket::INET socket object in non-blocking mode with the given 'hostport' argument.
+the constructor will wait $tcp->{timeout} milliseconds for the socket to connect.
+if socket creation/connection failed, ->new will return undefined.
 optional arguments:
 
 =over
@@ -127,7 +128,8 @@ sub read_first {
 	wait_timeout {
 		my $buffer;
 		my $len = read ($self->{sock}, $buffer, $length - length $data);
-		if (defined $len) {
+		# say "got len $len, is_connected? ";
+		if ($len) {
 			$data .= $buffer;
 		} elsif (length $data > 0) {
 			return $data
@@ -170,7 +172,7 @@ sends $msg data through the socket
 
 sub send {
 	my ($self, $msg) = @_;
-	$self->{sock}->send($msg);
+	$self->{sock}->print($msg);
 }
 
 =head2 $tcp->request($msg, $recv_length // 4096)
@@ -183,7 +185,7 @@ useful for simple request/response instances
 sub request {
 	my ($self, $msg, $recv_length) = @_;
 
-	$self->send($msg);
+	$self->print($msg);
 
 	return $self->read_data($recv_length)
 }

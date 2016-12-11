@@ -5,9 +5,10 @@ use warnings;
 use feature 'say';
 
 use Iron::TCP;
+use Iron::SSL;
 use LWP::UserAgent;
 
-my $tcp = Iron::TCP->new(hostport => 'www.example.org:80');
+my $tcp = Iron::SSL->new(hostport => 'www.example.org:443');
 $tcp->send("GET / HTTP/1.1\r\nHost: www.example.org\r\nConnection: close\r\n\r\n\r\n");
 say $tcp->read_first;
 

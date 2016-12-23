@@ -48,6 +48,9 @@ sub new {
 	return $self
 }
 
+sub connected { $_[0]{sock}->connected }
+
+
 
 =head2 see also
 

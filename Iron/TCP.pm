@@ -66,7 +66,6 @@ sub new {
 	) or return;
 	$self->{timeout} //= 5000; # 5000 ms
 	return unless wait_timeout { return $self->{sock}->connected } $self->{timeout};
-	say "connected";
 
 	return $self
 }
